@@ -63,7 +63,7 @@
 
 首先创建一个（非常简短的）可执行文件。在文本编辑器中创建一个新文件，命名为 `wyag`，并复制以下几行：
 
-``` python
+```python
 #!/usr/bin/env python3
 
 import libwyag
@@ -120,56 +120,56 @@ $ chmod +x wyag
 
 - Git 广泛使用 SHA-1 函数。在 Python 中，它位于 [hashlib](https://docs.python.org/3/library/hashlib.html) 中。
 
-    ``` python
+    ```python
     import hashlib
     ```
 
 - 只需要使用 [math](https://docs.python.org/3/library/math.html) 中的一个函数：
 
-    ``` python
+    ```python
     from math import ceil
     ```
 
 - [os](https://docs.python.org/3/library/os.html) 和 [os.path](https://docs.python.org/3/library/os.path.html) 提供了一些很好的文件系统抽象例程。
 
-    ``` python
+    ```python
     import os
     ```
 
 - 我们还需要使用一些正则表达式：
 
-    ``` python
+    ```python
     import re
     ```
 
 - 另外需要 [sys](https://docs.python.org/3/library/sys.html) 来访问实际的命令行参数（在 `sys.argv` 中）：
 
-    ``` python
+    ```python
     import sys
     ```
 
 - Git 使用 zlib 进行所有内容的压缩。Python 中也有 [这个功能](https://docs.python.org/3/library/zlib.html)：
 
-    ``` python
+    ```python
     import zlib
     ```
 
 导入完成。我们将频繁处理命令行参数。Python 提供了一个简单但功能强大的解析库 `argparse`。这是一个不错的库，但其接口可能并不是最直观的；如果需要，可以参考其 [文档](https://docs.python.org/3/library/argparse.html)。
 
-``` python
+```python
 argparser = argparse.ArgumentParser(description="最简单的内容跟踪器")
 ```
 
 我们需要处理子命令（如 git 中的 `init`、`commit` 等）。在 argparse 的术语中，这些被称为“子解析器”。此时我们只需声明我们的 CLI 将使用子解析器，并且所有调用都必须包含一个——你不能只调用 `git`，而是要调用 `git COMMAND`。
 
-``` python
+```python
 argsubparsers = argparser.add_subparsers(title="Commands", dest="command")
 argsubparsers.required = True
 ```
 
 `dest="command"` 参数表示所选择的子解析器的名称将作为字符串返回，存储在名为 `command` 的字段中。因此，我们只需读取这个字符串并相应地调用正确的函数。按照惯例，我将这些函数称为“桥接函数（bridges functions）”，并以 `cmd_` 为前缀。桥接函数将解析的参数作为唯一参数，并负责处理和验证它们，然后执行实际命令。
 
-``` python
+```python
 def main(argv=sys.argv[1:]):
     args = argparser.parse_args(argv)
     match args.command:
@@ -352,7 +352,7 @@ def repo_default_config():
 
 现在我们有了读取和创建仓库的代码，让我们通过创建 `wyag init` 命令来使这些代码可以从命令行使用。`wyag init` 的行为与 `git init` 一样——当然，定制化程度要低得多。`wyag init` 的语法如下：
 
-``` example
+```example
 wyag init [path]
 ```
 
@@ -360,13 +360,13 @@ wyag init [path]
 
 1. 我们需要创建一个 argparse 子解析器来处理我们命令的参数。
 
-    ``` src src-python
+    ```python
     argsp = argsubparsers.add_parser("init", help="初始化一个新的空仓库。")
     ```
 
     在 `init` 的情况下，有一个单独的可选位置参数：初始化仓库的路径。默认值为当前目录 `.`：
 
-    ``` src src-python
+    ```python
     argsp.add_argument("path",
                        metavar="directory",
                        nargs="?",
@@ -376,14 +376,14 @@ wyag init [path]
 
 2. 我们还需要一个“桥接”函数，该函数将从 argparse 返回的对象中读取参数值，并使用正确的值调用实际函数。
 
-    ``` src src-python
+    ```python
     def cmd_init(args):
         repo_create(args.path)
     ```
 
 就这样完成了！如果你按照这些步骤操作，现在应该能够在任何地方执行 `wyag init` 来创建一个 Git 仓库：
 
-``` example
+```example
 $ wyag init test
 ```
 
@@ -393,7 +393,7 @@ $ wyag init test
 
 在我们实现仓库的过程中，我们需要一个函数来找到当前仓库的根目录。我们会频繁使用这个函数，因为几乎所有的 Git 功能都在现有的仓库上工作（当然，`init` 除外！）。有时这个根目录是当前目录，但也可能是父目录：你的仓库根目录可能在 `~/Documents/MyProject`，而你当前可能在 `~/Documents/MyProject/src/tui/frames/mainview/` 工作。我们现在要创建的 `repo_find()` 函数将从当前目录开始查找根目录，并递归向上直到 `/`。为了识别一个路径是否为仓库，它将检查 `.git` 目录是否存在。
 
-``` src src-python
+```python
 def repo_find(path=".", required=True):
     path = os.path.realpath(path)
 
@@ -444,7 +444,7 @@ SHA-1 被称为“哈希函数”。简单来说，哈希函数是一种单向�
 
 在我们开始实现对象存储系统之前，必须了解它们的确切存储格式。一个对象以一个头部开始，头部指定其类型：`blob`、`commit`、`tag` 或 `tree`（稍后会详细介绍）。这个头部后面跟着一个 ASCII 空格（0x20），然后是以 ASCII 数字表示的对象大小（以字节为单位），接着是一个空字节（0x00），最后是对象的内容。在 Wyag 的仓库中，一个提交对象的前 48 个字节如下所示：
 
-``` example
+```example
 00000000  63 6f 6d 6d 69 74 20 31  30 38 36 00 74 72 65 65  |commit 1086.tree|
 00000010  20 32 39 66 66 31 36 63  39 63 31 34 65 32 36 35  | 29ff16c9c14e265|
 00000020  32 62 32 32 66 38 62 37  38 62 62 30 38 61 35 61  |2b22f8b78bb08a5a|
@@ -575,7 +575,7 @@ class GitBlob(GitObject):
 
 我们的简化版本只需接受两个位置参数：类型和对象标识符：
 
-``` example
+```example
 wyag cat-file TYPE OBJECT
 ```
 
@@ -622,7 +622,7 @@ def object_find(repo, name, fmt=None, follow=True):
 
 `wyag hash-object` 的语法是 `git hash-object` 的简化版本：
 
-``` example
+```example
 wyag hash-object [-w] [-t TYPE] FILE
 ```
 
@@ -705,7 +705,7 @@ cat pack-d9ef004d4ca729287f12aaaacf36fee39baa7c9d.pack | git unpack-objects
 
 现在我们可以读取和写入对象了，我们应该考虑提交。一个提交对象（未压缩，无头部）看起来是这样的：
 
-``` example
+```example
 tree 29ff16c9c14e2652b22f8b78bb08a5a07930c147
 parent 206941306e8a8af65b66eaaaea388a7ae24d49a0
 author Thibault Polge <thibault@thb.lt> 1527025023 +0200
@@ -991,7 +991,7 @@ dot -O -Tpdf log.dot
 
 与标签和提交不同，树对象是二进制对象，但它们的格式实际上非常简单。一个树是格式记录的串联，格式如下：
 
-``` example
+```example
 [mode] 空格 [path] 0x00 [sha-1]
 ```
 
@@ -1002,7 +1002,7 @@ dot -O -Tpdf log.dot
 
 解析器将会非常简单。首先，为单个记录（一个叶子，一个路径）创建一个小的对象包装：
 
-``` src src-python
+```python
 class GitTreeLeaf(object):
     def __init__(self, mode, path, sha):
         self.mode = mode
@@ -1012,7 +1012,7 @@ class GitTreeLeaf(object):
 
 由于树对象只是相同基本数据结构的重复，我们将解析器写成两个函数。首先是提取单个记录的解析器，它返回解析的数据和在输入数据中达到的位置：
 
-``` src src-python
+```python
 def tree_parse_one(raw, start=0):
     # 查找模式的空格终止符
     x = raw.find(b' ', start)
@@ -1036,7 +1036,7 @@ def tree_parse_one(raw, start=0):
 
 接下来是“真正”的解析器，它在循环中调用前一个解析器，直到输入数据被耗尽。
 
-``` src src-python
+```python
 def tree_parse(raw):
     pos = 0
     max = len(raw)
@@ -1052,7 +1052,7 @@ def tree_parse(raw):
 
 排序函数非常简单，但有一个意外的变化。条目按名称字母顺序排序，*但* 目录（即树条目）则添加了最终的 `/` 进行排序。这很重要，因为这意味着如果 `whatever` 是一个常规文件，它会在 `whatever.c` 之前排序，但如果 `whatever` 是一个目录，它会在之后排序，表现为 `whatever/`。（我不确定为什么 Git 这样做。如果你感兴趣，可以查看 Git 源代码中的 `tree.c` 文件中的 `base_name_compare` 函数。）
 
-``` src src-python
+```python
 # 注意这不是比较函数，而是转换函数。
 # Python 的默认排序不接受自定义比较函数，
 # 和大多数语言不同，而是接受返回新值的 `key` 参数，
@@ -1067,7 +1067,7 @@ def tree_leaf_sort_key(leaf):
 
 然后是序列化器本身。这个非常简单：我们使用新创建的函数作为转换器对条目进行排序，然后按顺序写入它们。
 
-``` src src-python
+```python
 def tree_serialize(obj):
     obj.items.sort(key=tree_leaf_sort_key)
     ret = b''
@@ -1083,7 +1083,7 @@ def tree_serialize(obj):
 
 现在我们只需将所有这些组合成一个类：
 
-``` src src-python
+```python
 class GitTree(GitObject):
     fmt=b'tree'
 
@@ -1101,7 +1101,7 @@ class GitTree(GitObject):
 
 既然我们在这方面，不妨给 wyag 添加`ls-tree`命令。这非常简单，没有理由不这样做。`git ls-tree [-r] TREE`简单地打印树的内容，使用`-r`标志时递归显示。在递归模式下，它不显示子树，只显示最终对象及其完整路径。
 
-``` src src-python
+```python
 argsp = argsubparsers.add_parser("ls-tree", help="美观地打印树对象。")
 argsp.add_argument("-r",
                    dest="recursive",
@@ -1152,7 +1152,7 @@ def ls_tree(repo, ref, recursive=None, prefix=""):
 
 让我们开始吧。像往常一样，我们需要一个子解析器：
 
-``` src src-python
+```python
 argsp = argsubparsers.add_parser("checkout", help="在一个目录中签出一个提交。")
 
 argsp.add_argument("commit",
@@ -1164,7 +1164,7 @@ argsp.add_argument("path",
 
 包装函数：
 
-``` src src-python
+```python
 def cmd_checkout(args):
     repo = repo_find()
 
@@ -1188,7 +1188,7 @@ def cmd_checkout(args):
 
 实际工作的函数：
 
-``` src src-python
+```python
 def tree_checkout(repo, tree, path):
     for item in tree.items:
         obj = object_read(repo, item.sha)
@@ -1211,13 +1211,13 @@ def tree_checkout(repo, tree, path):
 
 Git 引用，简称 refs，可能是 Git 中保存的最简单类型的对象。它们位于 `.git/refs` 的子目录中，包含以 ASCII 编码的对象哈希的十六进制表示。这些引用实际上就是这样简单：
 
-``` example
+```example
 6071c08bcb4757d8c89a30d9755d2466cef8c1de
 ```
 
 此外，refs 还可以引用另一个引用，从而间接地引用一个对象，在这种情况下，它们的格式如下：
 
-``` example
+```example
 ref: refs/remotes/origin/master
 ```
 
@@ -1232,7 +1232,7 @@ ref: refs/remotes/origin/master
 
 为了处理引用，我们首先需要一个简单的递归解析器，它将接受一个引用名称，跟踪可能的递归引用（内容以 `ref:` 开头的引用，如上所示），并返回一个 SHA-1 标识符：
 
-``` src src-python
+```python
 def ref_resolve(repo, ref):
     path = repo_file(repo, ref)
 
@@ -1254,7 +1254,7 @@ def ref_resolve(repo, ref):
 
 让我们创建两个小函数，并实现 `show-refs` 命令——它只是列出一个仓库中的所有引用。首先，一个简单的递归函数来收集引用并将其作为字典返回：
 
-``` src src-python
+```python
 def ref_list(repo, path=None):
     if not path:
         path = repo_dir(repo, "refs")
@@ -1273,7 +1273,7 @@ def ref_list(repo, path=None):
 
 和往常一样，我们需要一个子解析器，一个桥接函数，以及一个（递归）工作函数：
 
-``` src src-python
+```python
 argsp = argsubparsers.add_parser("show-ref", help="列出引用。")
 
 def cmd_show_ref(args):
@@ -1322,7 +1322,7 @@ git checkout 6071c08
 
 我们甚至不需要实现标签对象，可以重用 `GitCommit` 并只需更改 `fmt` 字段：
 
-``` src src-python
+```python
 class GitTag(GitCommit):
     fmt = b'tag'
 ```
@@ -1343,7 +1343,7 @@ git tag -a NAME [OBJECT] # 创建一个新的标签 *对象* NAME，指向
 
 这在 argparse 中的翻译如下。请注意，我们忽略了 `--list` 和 `[-a] name [object]` 之间的互斥关系，因为这对 argparse 来说似乎太复杂了。
 
-``` src src-python
+```python
 argsp = argsubparsers.add_parser(
     "tag",
     help="列出和创建标签")
@@ -1365,7 +1365,7 @@ argsp.add_argument("object",
 
 `cmd_tag` 函数将根据是否提供 `name` 来分发行为（列出或创建）。
 
-``` src src-python
+```python
 def cmd_tag(args):
     repo = repo_find()
 
@@ -1381,7 +1381,7 @@ def cmd_tag(args):
 
 我们只需要再添加一个函数来实际创建标签：
 
-``` src src-python
+```python
 def tag_create(repo, name, ref, create_tag_object=False):
     # 从对象引用获取 GitObject
     sha = object_find(repo, ref)
@@ -1451,7 +1451,7 @@ def ref_create(repo, ref_name, sha):
 
 为了方便，Git 允许通过名称的前缀来引用哈希。例如，`5bd254aa973646fa16f66d702a5826ea14a3eb45` 可以被称为 `5bd254`。这被称为“短哈希”。
 
-``` src src-python
+```python
 def object_resolve(repo, name):
     """将名称解析为 repo 中的对象哈希。
 
@@ -1507,7 +1507,7 @@ def object_resolve(repo, name):
 
 （这个过程是迭代的，因为可能需要不确定的步骤，因为标签本身可以被标记）
 
-``` src src-python
+```python
 def object_find(repo, name, fmt=None, follow=True):
       sha = object_resolve(repo, name)
 
@@ -1544,7 +1544,7 @@ def object_find(repo, name, fmt=None, follow=True):
 
 通过新的 `object_find()`，CLI wyag 变得更加可用。你现在可以做一些这样的事情：
 
-``` example
+```example
 $ wyag checkout v3.11 # 一个标签
 $ wyag checkout feature/explosions # 一个分支
 $ wyag ls-tree -r HEAD # 当前分支或提交。这里还有一个跟随：HEAD 实际上是一个提交。
@@ -1556,7 +1556,7 @@ $ wyag cat-file tree master # 一个分支，作为树（另一个“跟随”�
 
 让我们实现 `wyag rev-parse`。`git rev-parse` 命令做了很多事情，但我们要克隆的用例是解析引用。为了进一步测试 `object_find` 的“跟随”功能，我们将在其接口中添加一个可选的 `wyag-type` 参数。
 
-``` src src-python
+```python
 argsp = argsubparsers.add_parser(
     "rev-parse",
     help="解析修订版（或其他对象）标识符")
@@ -1574,7 +1574,7 @@ argsp.add_argument("name",
 
 桥接函数完成所有工作：
 
-``` src src-python
+```python
 def cmd_rev_parse(args):
     if args.type:
         fmt = args.type.encode()
@@ -1588,7 +1588,7 @@ def cmd_rev_parse(args):
 
 并且它可以正常工作：
 
-``` example
+```example
 $ wyag rev-parse --wyag-type commit HEAD
 6c22393f5e3830d15395fd8d2f8b0cf8eb40dd58
 $ wyag rev-parse --wyag-type tree HEAD
@@ -1641,7 +1641,7 @@ None
 
 我们需要表示的第一件事是单个条目。它实际上包含了很多内容，具体细节将在注释中说明。值得注意的是，一个条目同时存储了与对象存储中的 blob 相关联的 SHA-1 和关于实际文件的许多元数据。这是因为 `git/wyag status` 需要确定索引中的哪些文件被修改：首先检查最后修改的时间戳并与已知值进行比较，效率更高，然后再比较实际文件。
 
-``` python
+```python
 class GitIndexEntry (object):
     def __init__(self, ctime=None, mtime=None, dev=None, ino=None,
                  mode_type=None, mode_perms=None, uid=None, gid=None,
@@ -1678,7 +1678,7 @@ class GitIndexEntry (object):
 
 索引文件是一个二进制文件，可能出于性能原因。格式相对简单，它以一个包含 `DIRC` 魔术字节、版本号和索引文件中条目总数的头部开始。我们创建 `GitIndex` 类来保存这些信息：
 
-``` python
+```python
 class GitIndex (object):
     version = None
     entries = []
@@ -1699,7 +1699,7 @@ class GitIndex (object):
 
 这个格式可能是为了让索引文件能够直接通过 `mmapp()` 映射到内存，并作为 C 结构直接读取，从而在大多数情况下以 O(n) 时间构建索引。这种方法通常会在 C 语言中产生比在 Python 中更优雅的代码……
 
-``` python
+```python
 def index_read(repo):
     index_file = repo_file(repo, "index")
 
@@ -1802,7 +1802,7 @@ def index_read(repo):
 
 `git ls-files` 显示暂存区中文件的名称，通常带有大量选项。我们的 `ls-files` 将简单得多，但我们会添加一个 `--verbose` 选项，这是 git 中不存在的，以便显示索引文件中的每一个信息。
 
-``` python
+```python
 argsp = argsubparsers.add_parser("ls-files", help="列出所有暂存文件")
 argsp.add_argument("--verbose", action="store_true", help="显示所有信息。")
 
@@ -1845,14 +1845,14 @@ def cmd_ls_files(args):
 
 命令解析器同样很简单：
 
-``` python
+```python
 argsp = argsubparsers.add_parser("check-ignore", help="检查路径是否符合忽略规则。")
 argsp.add_argument("path", nargs="+", help="待检查的路径")
 ```
 
 函数也同样简单：
 
-``` python
+```python
 def cmd_check_ignore(args):
   repo = repo_find()
   rules = gitignore_read(repo)
@@ -1869,7 +1869,7 @@ def cmd_check_ignore(args):
 
 首先，单个模式的解析器。该解析器返回一对值：模式本身，以及一个布尔值，用于指示匹配该模式的文件是 *应该* 被排除 (`True`) 还是包含 (`False`)。换句话说，如果模式以 `!` 开头，则返回 `False`，否则返回 `True`。
 
-``` python
+```python
 def gitignore_parse1(raw):
     raw = raw.strip()  # 去除前后空格
 
@@ -1885,7 +1885,7 @@ def gitignore_parse1(raw):
 
 解析文件的过程就是收集该文件中的所有规则。请注意，这个函数并不解析 *文件*，而只是解析行的列表：这是因为我们也需要从 git blobs 中读取规则，而不仅仅是常规文件。
 
-``` python
+```python
 def gitignore_parse(lines):
     ret = list()
 
@@ -1904,7 +1904,7 @@ def gitignore_parse(lines):
 
 再次，我们定义一个类来持有这些信息：一个包含绝对规则的列表，以及一个包含相对规则的字典（哈希表）。这个哈希表的键是**目录**，相对于工作树的根目录。
 
-``` python
+```python
 class GitIgnore(object):
     absolute = None
     scoped = None
@@ -1916,7 +1916,7 @@ class GitIgnore(object):
 
 最后，我们的函数将收集仓库中的所有 gitignore 规则，并返回一个 `GitIgnore` 对象。请注意，它是从索引中读取作用域文件，而不是从工作树中读取：只有*已暂存*的 `.gitignore` 文件才重要（还要记住：HEAD *已经* 被暂存——暂存区是一个副本，而不是增量）。
 
-``` python
+```python
 def gitignore_read(repo):
     ret = GitIgnore(absolute=list(), scoped=dict())
 
@@ -1956,7 +1956,7 @@ def gitignore_read(repo):
 
 我们写三个小支持函数。一个是将路径与一组规则进行匹配，并返回最后一个匹配规则的结果。请注意，这不是一个真实的布尔函数，因为它有**三**种可能的返回值：`True`、`False` 和 `None`。如果没有匹配，则返回 `None`，这样调用者就知道应该继续尝试更一般的忽略文件（例如，向上移动一级目录）。
 
-``` python
+```python
 def check_ignore1(rules, path):
     result = None
     for (pattern, value) in rules:
@@ -1967,7 +1967,7 @@ def check_ignore1(rules, path):
 
 另一个函数用于与**作用域**规则（各种 `.gitignore` 文件）的字典进行匹配。它从路径的目录开始，递归向上移动到父目录，直到测试到根目录。请注意，这个函数（以及接下来的两个函数）从不在给定的 `.gitignore` 文件**内部**中中断。即使某个规则匹配，它们仍会继续遍历该文件，因为另一个规则可能会否定之前的效果（规则按顺序处理，因此如果你想排除 `*.c` 但不想排除 `generator.c`，一般规则必须在特定规则之前）。但是，只要在一个文件中至少有一个规则匹配，我们就丢弃剩余的文件，因为更一般的文件永远不会取消更具体的文件的效果（这就是为什么 `check_ignore1` 是三元的而不是布尔的原因）。
 
-``` python
+```python
 def check_ignore_scoped(rules, path):
     parent = os.path.dirname(path)
     while True:
@@ -1983,7 +1983,7 @@ def check_ignore_scoped(rules, path):
 
 一个更简单的函数用于与绝对规则列表进行匹配。注意，我们将这些规则推送到列表中的顺序很重要（我们*确实*先读取了仓库规则，然后才是全局规则！）。
 
-``` python
+```python
 def check_ignore_absolute(rules, path):
     parent = os.path.dirname(path)
     for ruleset in rules:
@@ -1995,7 +1995,7 @@ def check_ignore_absolute(rules, path):
 
 最后，定义一个函数将它们绑定在一起。
 
-``` python
+```python
 def check_ignore(rules, path):
     if os.path.isabs(path):
         raise Exception("此函数要求路径相对于仓库的根目录")
@@ -2009,7 +2009,7 @@ def check_ignore(rules, path):
 
 现在你可以调用 `wyag check-ignore`。在它自己的源树中：
 
-``` example
+```example
 $ wyag check-ignore hello.el hello.elc hello.html wyag.zip wyag.tar
 hello.elc
 hello.html
@@ -2024,7 +2024,7 @@ wyag.zip
 
 `status` 比 `ls-files` 更复杂，因为它需要将索引与 `HEAD` 和实际文件系统进行比较。你调用 `git status` 来知道自上一个提交以来哪些文件被添加、删除或修改，以及这些更改中哪些实际上是已暂存的，并将包含在下一个提交中。因此，`status` 实际上比较 `HEAD` 与暂存区，以及暂存区与工作树之间的差异。它的输出看起来像这样：
 
-``` example
+```example
 在分支 master 上
 
 待提交的更改：
@@ -2046,13 +2046,13 @@ wyag.zip
 
 公共接口非常简单，我们的状态命令不接受任何参数：
 
-``` python
+```python
 argsp = argsubparsers.add_parser("status", help = "显示工作树状态。")
 ```
 
 桥接函数按顺序调用三个组件函数：
 
-``` python
+```python
 def cmd_status(_):
     repo = repo_find()
     index = index_read(repo)
@@ -2067,7 +2067,7 @@ def cmd_status(_):
 
 首先，我们需要知道我们是否在一个分支上，如果是的话是哪一个。我们通过查看 `.git/HEAD` 来实现。它应该包含一个十六进制 ID（指向一个提交，表示分离的 HEAD 状态），或者一个指向 `refs/heads/` 中某个内容的间接引用：即活动分支。我们返回其名称或 `False`。
 
-``` python
+```python
 def branch_get_active(repo):
     with open(repo_file(repo, "HEAD"), "r") as f:
         head = f.read()
@@ -2080,7 +2080,7 @@ def branch_get_active(repo):
 
 基于此，我们可以编写桥接调用的三个 `cmd_status_*` 函数中的第一个。这个函数打印活动分支的名称，或者分离 HEAD 的哈希值：
 
-``` python
+```python
 def cmd_status_branch(repo):
     branch = branch_get_active(repo)
     if branch:
@@ -2095,7 +2095,7 @@ def cmd_status_branch(repo):
 
 首先，编写一个将树（递归的，记住）转换为（扁平的）字典的函数。由于树是递归的，因此该函数本身也是递归的——对此表示歉意 :)
 
-``` python
+```python
 def tree_to_dict(repo, ref, prefix=""):
   ret = dict()
   tree_sha = object_find(repo, ref, fmt=b"tree")
@@ -2118,7 +2118,7 @@ def tree_to_dict(repo, ref, prefix=""):
 
 接下来是命令本身：
 
-``` python
+```python
 def cmd_status_head_index(repo, index):
     print("待提交的更改：")
 
@@ -2138,7 +2138,7 @@ def cmd_status_head_index(repo, index):
 
 #### 8.5.3. 查找索引与工作树之间的变化
 
-``` python
+```python
 def cmd_status_index_worktree(repo, index):
     print("未暂存的更改：")
 
@@ -2197,7 +2197,7 @@ def cmd_status_index_worktree(repo, index):
 
 我们的状态函数完成了。它的输出应该类似于：
 
-``` example
+```example
 $ wyag status
 在分支 main 上。
 待提交的更改：
@@ -2213,7 +2213,7 @@ $ wyag status
 
 真实的 `status` 更加智能：例如，它可以检测重命名，而我们的版本则无法。还有一个显著的区别值得提及的是，`git status` 实际上会在文件元数据被修改但内容未被修改时，*写回* 索引。您可以通过我们的特殊 `ls-files` 查看这一点：
 
-``` example
+```example
 $ wyag ls-files --verbose
 索引文件格式 v2，包含 1 个条目。
 file
@@ -2248,7 +2248,7 @@ file
 
 我们将首先写入索引。大致上，我们只是将所有内容序列化回二进制。这有点繁琐，但代码应该是直接明了的。我会将一些细节留给注释，但实际上这只是 `index_read` 的反向操作——如有需要，请参考它和 `GitIndexEntry` 类。
 
-``` src src-python
+```python
 def index_write(repo, index):
     with open(repo_file(repo, "index"), "wb") as f:
 
@@ -2316,7 +2316,7 @@ def index_write(repo, index):
 
 `rm` 接受一个参数，即要移除的路径列表：
 
-``` src src-python
+```python
 argsp = argsubparsers.add_parser("rm", help="从工作树和索引中移除文件。")
 argsp.add_argument("path", nargs="+", help="要移除的文件")
 
@@ -2327,7 +2327,7 @@ def cmd_rm(args):
 
 `rm` 函数稍微长一些，但它非常简单。它接受一个仓库和一个路径列表，读取该仓库的索引，并移除与该列表匹配的索引条目。可选参数控制函数是否实际删除文件，以及如果某些路径在索引中不存在，是否应中止操作（这两个参数用于 `add`，在 `wyag rm` 命令中不暴露）。
 
-``` src src-python
+```python
 def rm(repo, paths, delete=True, skip_missing=False):
   # 查找并读取索引
   index = index_read(repo)
@@ -2379,7 +2379,7 @@ def rm(repo, paths, delete=True, skip_missing=False):
 
 首先是接口。没有什么惊喜，`wyag add PATH ...`，其中 PATH 是一个或多个要暂存的文件。桥接函数非常简单。
 
-``` src src-python
+```python
 argsp = argsubparsers.add_parser("add", help="将文件内容添加到索引。")
 argsp.add_argument("path", nargs="+", help="要添加的文件")
 
@@ -2390,7 +2390,7 @@ def cmd_add(args):
 
 与 `rm` 的主要区别在于 `add` 需要创建一个索引条目。这并不难：我们只需对文件进行 `stat()` 操作，并将元数据复制到索引的字段中（`stat()` 返回索引存储的元数据：创建/修改时间等）。
 
-``` src src-python
+```python
 def add(repo, paths, delete=True, skip_missing=False):
 
   # 首先从索引中移除所有路径（如果存在）。
@@ -2438,7 +2438,7 @@ def add(repo, paths, delete=True, skip_missing=False):
 
 现在我们已经修改了索引，也就是实际的 *暂存更改*，我们只需要将这些更改转换为一个提交。这就是 `commit` 的作用。
 
-``` src src-python
+```python
 argsp = argsubparsers.add_parser("commit", help="记录对仓库的更改。")
 
 argsp.add_argument("-m",
@@ -2451,7 +2451,7 @@ argsp.add_argument("-m",
 
 在进入有趣的细节之前，我们需要读取 Git 的配置，以获取用户的名字，作为作者和提交者。我们将使用之前用来读取仓库配置的 `configparser` 库。
 
-``` src src-python
+```python
 def gitconfig_read():
     xdg_config_home = os.environ["XDG_CONFIG_HOME"] if "XDG_CONFIG_HOME" in os.environ else "~/.config"
     configfiles = [
@@ -2466,7 +2466,7 @@ def gitconfig_read():
 
 接下来是一个简单的函数，用于获取并格式化用户身份：
 
-``` src src-python
+```python
 def gitconfig_user_get(config):
     if "user" in config:
         if "name" in config["user"] and "email" in config["user"]:
@@ -2487,7 +2487,7 @@ def gitconfig_user_get(config):
 
 由于这可能看起来有些复杂，让我们详细演示这个例子——随意跳过。在开始时，我们从索引构建的字典如下所示：
 
-``` example
+```example
 contents["assets/sprites/monsters"] =
   [ cacodemon.png : GitIndexEntry
   , imp.png : GitIndexEntry
@@ -2509,7 +2509,7 @@ contents[""] = # 根！
 
 假设我们新生成的树哈希值，由直接来自 `assets/sprites/monsters` 的索引条目生成，哈希值为 `426f894781bc3c38f1d26f8fd2c7f38ab8d21763`。我们 **修改我们的字典**，将这个新的树对象添加到目录的父级，像这样，所以现在剩下的遍历内容看起来是这样的：
 
-``` example
+```example
 contents["assets/sprites/keys"] = # <- 未修改。
   [ red.png : GitIndexEntry
   , blue.png : GitIndexEntry
@@ -2524,7 +2524,7 @@ contents[""] = # 根！
 
 我们对下一个最长的键 `assets/sprites/keys` 做同样的操作，生成一个哈希为 `b42788e087b1e94a0e69dcb7a4a243eaab802bb2` 的树，因此：
 
-``` example
+```example
 contents["assets/sprites/"] =
   [ hero.png : GitIndexEntry
   , monsters : Tree 426f894781bc3c38f1d26f8fd2c7f38ab8d21763
@@ -2536,7 +2536,7 @@ contents[""] = # 根！
 
 接着，我们从 `assets/sprites` 生成哈希为 `6364113557ed681d775ccbd3c90895ed276956a2` 的树，它现在包含我们的两个树和 `hero.png`。
 
-``` example
+```example
 contents["assets/"] = [
   sprites: Tree 6364113557ed681d775ccbd3c90895ed276956a2 ]
 contents[""] = # 根！
@@ -2545,7 +2545,7 @@ contents[""] = # 根！
 
 `assets` 反过来变成哈希为 `4d35513cb6d2a816bc00505be926624440ebbddd` 的树，因此：
 
-``` example
+```example
 contents[""] = # 根！
   [ README: GitIndexEntry,
     assets: 4d35513cb6d2a816bc00505be926624440ebbddd]
@@ -2555,7 +2555,7 @@ contents[""] = # 根！
 
 这里是实际的函数：
 
-``` python
+```python
 def tree_from_index(repo, index):
     contents = dict()
     contents[""] = list()
@@ -2614,7 +2614,7 @@ def tree_from_index(repo, index):
 
 创建提交对象的函数足够简单，它只接受一些参数：树的哈希、父提交的哈希、作者的身份（一个字符串）、时间戳和时区差值，以及消息：
 
-``` python
+```python
 def commit_create(repo, tree, parent, author, timestamp, message):
     commit = GitCommit()  # 创建新的提交对象
     commit.kvlm[b"tree"] = tree.encode("ascii")
@@ -2638,7 +2638,7 @@ def commit_create(repo, tree, parent, author, timestamp, message):
 
 剩下的就是 `cmd_commit`，它是 `wyag commit` 命令的桥接函数：
 
-``` python
+```python
 def cmd_commit(args):
     repo = repo_find()
     index = index_read(repo)
