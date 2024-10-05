@@ -18,21 +18,21 @@
 
 更具体地说，我们将实现：
 
-- `add` （[wyag 源代码](#cmd-add)） [git 手册页面](https://git-scm.com/docs/git-add)
-- `cat-file` （[wyag 源代码](#cmd-cat-file)） [git 手册页面](https://git-scm.com/docs/git-cat-file)
-- `check-ignore` （[wyag 源代码](#cmd-check-ignore)） [git 手册页面](https://git-scm.com/docs/git-check-ignore)
-- `checkout` （[wyag 源代码](#cmd-checkout)） [git 手册页面](https://git-scm.com/docs/git-checkout)
-- `commit` （[wyag 源代码](#cmd-commit)） [git 手册页面](https://git-scm.com/docs/git-commit)
-- `hash-object` （[wyag 源代码](#cmd-hash-object)） [git 手册页面](https://git-scm.com/docs/git-hash-object)
-- `init` （[wyag 源代码](#cmd-init)） [git 手册页面](https://git-scm.com/docs/git-init)
-- `log` （[wyag 源代码](#cmd-log)） [git 手册页面](https://git-scm.com/docs/git-log)
-- `ls-files` （[wyag 源代码](#cmd-ls-files)） [git 手册页面](https://git-scm.com/docs/git-ls-files)
-- `ls-tree` （[wyag 源代码](#cmd-ls-tree)） [git 手册页面](https://git-scm.com/docs/git-ls-tree)
-- `rev-parse` （[wyag 源代码](#cmd-rev-parse)） [git 手册页面](https://git-scm.com/docs/git-rev-parse)
-- `rm` （[wyag 源代码](#cmd-rm)） [git 手册页面](https://git-scm.com/docs/git-rm)
-- `show-ref` （[wyag 源代码](#cmd-show-ref)） [git 手册页面](https://git-scm.com/docs/git-show-ref)
-- `status` （[wyag 源代码](#cmd-status)） [git 手册页面](https://git-scm.com/docs/git-status)
-- `tag` （[wyag 源代码](#cmd-tag)） [git 手册页面](https://git-scm.com/docs/git-tag)
+- `add` （[wyag 源代码](#93-add-命令)） [git 手册页面](https://git-scm.com/docs/git-add)
+- `cat-file` （[wyag 源代码](#46-cat-file-命令)） [git 手册页面](https://git-scm.com/docs/git-cat-file)
+- `check-ignore` （[wyag 源代码](#84-绕道check-ignore-命令)） [git 手册页面](https://git-scm.com/docs/git-check-ignore)
+- `checkout` （[wyag 源代码](#64-checkout-命令)） [git 手册页面](https://git-scm.com/docs/git-checkout)
+- `commit` （[wyag 源代码](#94-commit-命令)） [git 手册页面](https://git-scm.com/docs/git-commit)
+- `hash-object` （[wyag 源代码](#47-hash-object-命令)） [git 手册页面](https://git-scm.com/docs/git-hash-object)
+- `init` （[wyag 源代码](#32-init-命令)） [git 手册页面](https://git-scm.com/docs/git-init)
+- `log` （[wyag 源代码](#53-log-命令)） [git 手册页面](https://git-scm.com/docs/git-log)
+- `ls-files` （[wyag 源代码](#83-ls-files-命令)） [git 手册页面](https://git-scm.com/docs/git-ls-files)
+- `ls-tree` （[wyag 源代码](#63-显示树ls-tree)） [git 手册页面](https://git-scm.com/docs/git-ls-tree)
+- `rev-parse` （[wyag 源代码](#762-rev-parse-命令)） [git 手册页面](https://git-scm.com/docs/git-rev-parse)
+- `rm` （[wyag 源代码](#92-rm-命令)） [git 手册页面](https://git-scm.com/docs/git-rm)
+- `show-ref` （[wyag 源代码](#71-什么是引用以及-show-ref-命令)） [git 手册页面](https://git-scm.com/docs/git-show-ref)
+- `status` （[wyag 源代码](#85-status-命令)） [git 手册页面](https://git-scm.com/docs/git-status)
+- `tag` （[wyag 源代码](#74-tag-命令)） [git 手册页面](https://git-scm.com/docs/git-tag)
 
 你无需掌握太多知识即可跟上这篇文章：只需了解一些基本的 Git（显然）、一些基本的 Python 和一些基本的 shell 知识。
 
@@ -850,7 +850,7 @@ class GitCommit(GitObject):
         self.kvlm = dict()
 ```
 
-### 5.3. 日志命令
+### 5.3. log 命令
 
 我们将实现一个比 Git 提供的 `log` 简单得多的版本。最重要的是，我们不会处理日志的表示，而是将 Graphviz 数据输出，让用户使用 `dot` 来渲染实际的日志。（如果你不知道如何使用 Graphviz，只需将原始输出粘贴到 [这个网站](https://dreampuf.github.io/GraphvizOnline/)。如果链接失效，请在你喜欢的搜索引擎中搜索“graphviz online”）
 
@@ -2022,7 +2022,7 @@ wyag.zip
 
 这并不是一个完美的重新实现。特别是，通过仅使用目录名称的规则（例如 `__pycache__`）来排除整个目录将不起作用，因为 `fnmatch` 需要模式为 `__pycache__/**`。如果你真的想玩弄忽略规则，[这可能是一个不错的起点](https://github.com/mherrmann/gitignore_parser)。
 
-### 8.5. 状态命令
+### 8.5. status 命令
 
 `status` 比 `ls-files` 更复杂，因为它需要将索引与 `HEAD` 和实际文件系统进行比较。你调用 `git status` 来知道自上一个提交以来哪些文件被添加、删除或修改，以及这些更改中哪些实际上是已暂存的，并将包含在下一个提交中。因此，`status` 实际上比较 `HEAD` 与暂存区，以及暂存区与工作树之间的差异。它的输出看起来像这样：
 
