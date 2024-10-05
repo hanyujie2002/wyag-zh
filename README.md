@@ -1333,7 +1333,7 @@ class GitTag(GitCommit):
 
 让我们添加 `tag` 命令。在 Git 中，它有两个功能：创建一个新标签或列出现有标签（默认情况下）。因此，你可以这样调用它：
 
-``` src src-shell
+```shell
 git tag                  # 列出所有标签
 git tag NAME [OBJECT]    # 创建一个新的 *轻量* 标签 NAME，指向
                          # HEAD（默认）或 OBJECT
