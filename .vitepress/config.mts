@@ -14,6 +14,7 @@ export default defineConfig({
     ['meta', { name: 'twitter:description', content: '自己动手写 Git（Write Your site description' }],
     ['meta', { name: 'twitter:image', content: 'https://wyag-zh.hanyujie.xyz/logo.png' }]
   ],
+  srcExclude: ['README.md'],
   sitemap: {
     hostname: 'https://wyag-zh.hanyujie.xyz/',
   },
@@ -124,12 +125,12 @@ export default defineConfig({
             }
           }
         }
-      }
+      },
     },
     logo: '/logo.png',
     i18nRouting: false,
     socialLinks: [
       { icon: 'github', link: 'https://github.com/hanyujie2002/wyag-zh' }
     ]
-  }
+  },
 })
