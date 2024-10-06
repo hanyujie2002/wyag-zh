@@ -1,5 +1,6 @@
 ﻿---
 search: false
+next: false
 ---
 
 # 从零开始写 Git
