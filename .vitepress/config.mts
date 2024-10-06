@@ -36,7 +36,7 @@ export default defineConfig({
       {
         text: '',
         items: [
-          { text: '一文流', link: './docs/wyag-zh' },
+          { text: '一文流', link: '/docs/wyag-zh' },
         ]
       },
       {
