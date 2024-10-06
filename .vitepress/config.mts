@@ -12,7 +12,7 @@ export default defineConfig({
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'twitter:title', content: '自己动手写 Git' }],
     ['meta', { name: 'twitter:description', content: '自己动手写 Git（Write Your site description' }],
-    ['meta', { name: 'twitter:image', content: 'https://example.com/image.jpg' }]
+    ['meta', { name: 'twitter:image', content: 'https://wyag-zh.hanyujie.xyz/logo.png' }]
   ],
   title: "自己动手写 Git",
   description: "从零开始写 Git（Write Yourself a Git，简称 wyag） 的中文翻译 | Chinese translation of Write Yourself a Git",
