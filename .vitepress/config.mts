@@ -14,6 +14,9 @@ export default defineConfig({
     ['meta', { name: 'twitter:description', content: '自己动手写 Git（Write Your site description' }],
     ['meta', { name: 'twitter:image', content: 'https://wyag-zh.hanyujie.xyz/logo.png' }]
   ],
+  sitemap: {
+    hostname: 'https://wyag-zh.hanyujie.xyz/',
+  },
   title: "自己动手写 Git",
   lang: 'zh-CN',
   locales: {
