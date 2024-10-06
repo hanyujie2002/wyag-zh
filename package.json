@@ -1,0 +1,23 @@
+{
+  "name": "wyag-zh",
+  "version": "1.0.0",
+  "description": "从零开始写 Git（Write Yourself a Git，简称 wyag） 的中文翻译 | Chinese translation of Write Yourself a Git",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "",
+  "devDependencies": {
+    "vitepress": "^1.3.4"
+  },
+  "dependencies": {
+    "install": "^0.13.0",
+    "markdown-it-footnote": "^4.0.0",
+    "npm": "^10.9.0"
+  }
+}

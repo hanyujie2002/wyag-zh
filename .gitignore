@@ -1,0 +1,18 @@
+# Node modules
+node_modules/
+
+# VitePress cache and build output
+.vitepress/cache
+.vitepress/dist
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Other common files to ignore
+.DS_Store
