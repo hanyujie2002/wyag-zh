@@ -26,6 +26,12 @@ export default defineConfig({
   markdown: {
     config: (md) => {
       md.use(footnote);
+    },
+    container: {
+      warningLabel: '警告',
+      noteLabel: '备注',
+      dangerLabel: '危险',
+      infoLabel: '信息',
     }
   },
   themeConfig: {
