@@ -8,6 +8,7 @@ export default defineConfig({
     ['meta', { property: 'og:description', content: '自己动手写 Git（Write Yourself a Git，简称 wyag） 的中文翻译' }],
     ['meta', { property: 'og:image', content: 'https://wyag-zh.hanyujie.xyz/logo.png' }],
     ['meta', { property: 'og:url', content: 'https://https://wyag-zh.hanyujie.xyz' }],
+    ['meta', { property: 'og:site_name', content: '自己动手写 Git' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'twitter:title', content: '自己动手写 Git' }],
     ['meta', { name: 'twitter:description', content: '自己动手写 Git（Write Your site description' }],
