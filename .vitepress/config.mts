@@ -3,6 +3,15 @@ import footnote from 'markdown-it-footnote'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  head: [
+    ['meta', { property: 'og:title', content: '自己动手写 Git' }],
+    ['meta', { property: 'og:description', content: '自己动手写 Git（Write Yourself a Git，简称 wyag） 的中文翻译' }],
+    ['meta', { property: 'og:image', content: 'https://wyag-zh.hanyujie.xyz/logo.png' }],
+    ['meta', { property: 'og:url', content: 'https://https://wyag-zh.hanyujie.xyz' }],
+    ['meta', { name: 'twitter:title', content: '自己动手写 Git' }],
+    ['meta', { name: 'twitter:description', content: '自己动手写 Git（Write Yourself a Git，简称 wyag） 的中文翻译' }],
+    ['meta', { name: 'twitter:image', content: 'https://example.com/image.jpg' }]
+  ],
   title: "自己动手写 Git",
   description: "从零开始写 Git（Write Yourself a Git，简称 wyag） 的中文翻译 | Chinese translation of Write Yourself a Git",
   markdown: {
@@ -13,8 +22,8 @@ export default defineConfig({
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     // nav: [
-      // { text: 'Home', link: '/README' },
-      // { text: 'Examples', link: '/markdown-examples' }
+    // { text: 'Home', link: '/README' },
+    // { text: 'Examples', link: '/markdown-examples' }
     // ],
     outline: 'deep',
     sidebar: [
@@ -61,7 +70,7 @@ export default defineConfig({
     search: {
       provider: 'local',
     },
-    logo: '/favicon.ico',
+    logo: '/logo.png',
     socialLinks: [
       { icon: 'github', link: 'https://github.com/hanyujie2002/wyag-zh' }
     ]
