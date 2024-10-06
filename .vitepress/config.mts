@@ -16,6 +16,12 @@ export default defineConfig({
   ],
   title: "自己动手写 Git",
   lang: 'zh-CN',
+  locales: {
+    root: {
+      label: '简体中文',
+      lang: 'zh-CN',
+    },
+  },
   description: "从零开始写 Git（Write Yourself a Git，简称 wyag） 的中文翻译 | Chinese translation of Write Yourself a Git",
   markdown: {
     config: (md) => {
@@ -29,6 +35,12 @@ export default defineConfig({
     // { text: 'Examples', link: '/markdown-examples' }
     // ],
     outline: 'deep',
+    outlineTitle: '本页内容',
+    returnToTopLabel: '返回顶部',
+    darkModeSwitchLabel: '外观',
+    sidebarMenuLabel: '菜单',
+    darkModeSwitchTitle: '切换到深色模式',
+    lightModeSwitchTitle: '切换到浅色模式',
     sidebar: [
       {
         text: '教程',
@@ -70,10 +82,43 @@ export default defineConfig({
         ]
       }
     ],
+    docFooter: {
+      prev: '上一页',
+      next: '下一页',
+    },
     search: {
       provider: 'local',
+      options: {
+        locales: {
+          root: {
+            translations: {
+              button: {
+                buttonText: '搜索',
+                buttonAriaLabel: '搜索'
+              },
+              modal: {
+                displayDetails: '显示详细列表',
+                resetButtonTitle: '重置搜索',
+                backButtonTitle: '关闭搜索',
+                noResultsText: '没有结果',
+                footer: {
+                  selectText: '选择',
+                  selectKeyAriaLabel: '输入',
+                  navigateText: '导航',
+                  navigateUpKeyAriaLabel: '上箭头',
+                  navigateDownKeyAriaLabel: '下箭头',
+                  closeText: '关闭',
+                  closeKeyAriaLabel: 'esc'
+                }
+              }
+
+            }
+          }
+        }
+      }
     },
     logo: '/logo.png',
+    i18nRouting: false,
     socialLinks: [
       { icon: 'github', link: 'https://github.com/hanyujie2002/wyag-zh' }
     ]
