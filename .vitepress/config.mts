@@ -16,14 +16,14 @@ export default defineConfig({
   ],
 
   transformHead({ assets }) {
-    const fontFiles = assets.filter(file => /NotoSansSC-.*\.ttf/.test(file))
+    const fontFiles = assets.filter(file => /NotoSansSC-.*\.woff2/.test(file))
     return fontFiles.map(file => [
       'link',
       {
         rel: 'preload',
         href: file,
         as: 'font',
-        type: 'font/ttf',
+        type: 'font/woff2',
         crossorigin: '',
       },
     ]);
