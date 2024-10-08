@@ -14,6 +14,21 @@ export default defineConfig({
     ['meta', { name: 'twitter:description', content: '自己动手写 Git（Write Your site description' }],
     ['meta', { name: 'twitter:image', content: 'https://wyag-zh.hanyujie.xyz/logo.png' }]
   ],
+
+  transformHead({ assets }) {
+    const fontFiles = assets.filter(file => /NotoSansSC-.*\.ttf/.test(file))
+    return fontFiles.map(file => [
+      'link',
+      {
+        rel: 'preload',
+        href: file,
+        as: 'font',
+        type: 'font/ttf',
+        crossorigin: '',
+      },
+    ]);
+  },
+
   srcExclude: ['README.md'],
   sitemap: {
     hostname: 'https://wyag-zh.hanyujie.xyz/',

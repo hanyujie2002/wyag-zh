@@ -1,3 +1,17 @@
-body {
-    font-synthesis: weight;
+@font-face {
+    font-family: 'Noto Sans SC';
+    src: url('/assets/fonts/NotoSansSC-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Noto Sans SC';
+    src: url('/assets/fonts/NotoSansSC-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+
+:root {
+    --vp-font-family-base: "Noto Sans SC", sans-serif;
 }
