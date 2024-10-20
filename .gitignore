@@ -4,6 +4,8 @@ node_modules/
 # VitePress cache and build output
 .vitepress/cache
 .vitepress/dist
+docs/.vitepress
+bilingual/docs/.vitepress
 
 # Logs
 logs/
@@ -19,3 +21,4 @@ logs/
 
 /wyag.md 
 /wyag1.md
+*.pdf
