@@ -39,12 +39,7 @@ export default defineConfig({
     root: {
       label: '简体中文',
       lang: 'zh-CN',
-    },
-    bilingual: {
-      label: '双语',
-      lang: 'bilingual',
-      link: '/bilingual/'
-    },
+    }
   },
   description: "从零开始写 Git（Write Yourself a Git，简称 wyag） 的中文翻译 | Chinese translation of Write Yourself a Git",
   markdown: {
@@ -89,12 +84,6 @@ export default defineConfig({
           ]
         },
         {
-          text: '',
-          items: [
-            { text: '一文流', link: '/docs/wyag-zh' },
-          ]
-        },
-        {
           text: '版权',
           items: [
             { text: 'CC BY-NC-SA 4.0', link: 'https://creativecommons.org/licenses/by-nc-sa/4.0/' }
@@ -112,53 +101,8 @@ export default defineConfig({
             { text: 'hanyujie2002', link: 'https://github.com/hanyujie2002' }
           ]
         }
-      ],
-
-      '/bilingual/': [
-        {
-          text: '教程',
-          items: [
-            { text: '1. 引言', link: '/bilingual/docs/1.-引言' },
-            { text: '2. 开始', link: '/bilingual/docs/2.-开始' },
-            { text: '3. 创建仓库：init', link: '/bilingual/docs/3.-创建仓库init' },
-            { text: '4. 读取和写入对象：hash-object 和 cat-file', link: '/bilingual/docs/4.-读取和写入对象hash-object-和-cat-file' },
-            { text: '5. 阅读提交历史日志', link: '/bilingual/docs/5.-阅读提交历史日志' },
-            { text: '6. 读取提交数据检出', link: '/bilingual/docs/6.-读取提交数据检出' },
-            { text: '7. 引用标签和分支', link: '/bilingual/docs/7.-引用标签和分支' },
-            { text: '8. 处理暂存区和索引文件', link: '/bilingual/docs/8.-处理暂存区和索引文件' },
-            { text: '9. 暂存区和索引，第二部分暂存和提交', link: '/bilingual/docs/9.-暂存区和索引第二部分暂存和提交' },
-            { text: '10. 最后的话', link: '/bilingual/docs/10.-最后的话' }
-          ]
-        },
-        {
-          text: '',
-          items: [
-            { text: '一文流', link: '/docs/wyag-zh' },
-          ]
-        },
-        {
-          text: '版权',
-          items: [
-            { text: 'CC BY-NC-SA 4.0', link: 'https://creativecommons.org/licenses/by-nc-sa/4.0/' }
-          ]
-        },
-        {
-          text: '原作者',
-          items: [
-            { text: 'Thibault Polge', link: 'https://github.com/thblt' },
-          ]
-        },
-        {
-          text: '译者',
-          items: [
-            { text: 'hanyujie2002', link: 'https://github.com/hanyujie2002' }
-          ]
-        }
-
       ]
     },
-
-
     docFooter: {
       prev: '上一页',
       next: '下一页',
@@ -190,31 +134,6 @@ export default defineConfig({
               }
 
             }
-          },
-          'bilingual': {
-            translations: {
-              button: {
-                buttonText: '搜索',
-                buttonAriaLabel: '搜索'
-              },
-              modal: {
-                displayDetails: '显示详细列表',
-                resetButtonTitle: '重置搜索',
-                backButtonTitle: '关闭搜索',
-                noResultsText: '没有结果',
-                footer: {
-                  selectText: '选择',
-                  selectKeyAriaLabel: '输入',
-                  navigateText: '导航',
-                  navigateUpKeyAriaLabel: '上箭头',
-                  navigateDownKeyAriaLabel: '下箭头',
-                  closeText: '关闭',
-                  closeKeyAriaLabel: 'esc'
-                }
-              }
-
-            }
-
           }
         }
       },
