@@ -1,0 +1,13 @@
+[book]
+authors = ["https://github.com/hanyujie2002/wyag-zh","https://github.com/thblt/write-yourself-a-git"]
+language = "zh-CN"
+# multilingual = false
+src = "docs"
+title = "从零开始写 Git"
+
+# 添加章节序号
+[preprocessor.chapter-number]
+
+# 导出 html、pdf、带目录的pdf
+[output.html]
+[output.pdf]

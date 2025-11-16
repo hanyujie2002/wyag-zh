@@ -8,8 +8,7 @@
     "docs:dev": "vitepress dev",
     "docs:build": "vitepress build",
     "docs:preview": "vitepress preview",
-    "docs:pdf-zh": "press-export-pdf export docs -c .vitepress/vitepress-pdf.config.ts",
-    "docs:pdf-en": "press-export-pdf export bilingual/docs"
+    "docs:pdf-zh": "press-export-pdf export docs -c .vitepress/vitepress-pdf.config.ts"
   },
   "keywords": [],
   "author": "",

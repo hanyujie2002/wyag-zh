@@ -19,6 +19,7 @@ logs/
 # Other common files to ignore
 .DS_Store
 
-/wyag.md 
+/wyag.md
 /wyag1.md
 *.pdf
+book/
